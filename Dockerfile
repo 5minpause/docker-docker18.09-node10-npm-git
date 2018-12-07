@@ -1,66 +1,9 @@
-# Get base alpine image with node 10
-# Based on this: https://hub.docker.com/r/mhart/alpine-node/
-# FROM alpine:3.6
 FROM docker:18.09-git
 
 MAINTAINER Holger Frohloff <holger@holgerfrohloff.de>>
 ENV VERSION=v10.14.0 NPM_VERSION=6
 
-# Install docker inside the image
-# Copied from https://github.com/docker-library/docker/tree/91bbc4f7b06c06020d811dafb2266bcd7cf6c06d/18.09
-# RUN apk add --no-cache \
-# 		ca-certificates
-#
-# # set up nsswitch.conf for Go's "netgo" implementation (which Docker explicitly uses)
-# # - https://github.com/docker/docker-ce/blob/v17.09.0-ce/components/engine/hack/make.sh#L149
-# # - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
-# # - docker run --rm debian:stretch grep '^hosts:' /etc/nsswitch.conf
-# RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
-#
-# ENV DOCKER_CHANNEL stable
-# ENV DOCKER_VERSION 18.09.0
-# # TODO ENV DOCKER_SHA256
-# # https://github.com/docker/docker-ce/blob/5b073ee2cf564edee5adca05eee574142f7627bb/components/packaging/static/hash_files !!
-# # (no SHA file artifacts on download.docker.com yet as of 2017-06-07 though)
-#
-# RUN set -eux; \
-# 	\
-# # this "case" statement is generated via "update.sh"
-# 	apkArch="$(apk --print-arch)"; \
-# 	case "$apkArch" in \
-# 		x86_64) dockerArch='x86_64' ;; \
-# 		armhf) dockerArch='armel' ;; \
-# 		aarch64) dockerArch='aarch64' ;; \
-# 		ppc64le) dockerArch='ppc64le' ;; \
-# 		s390x) dockerArch='s390x' ;; \
-# 		*) echo >&2 "error: unsupported architecture ($apkArch)"; exit 1 ;;\
-# 	esac; \
-# 	\
-# 	if ! wget -O docker.tgz "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/${dockerArch}/docker-${DOCKER_VERSION}.tgz"; then \
-# 		echo >&2 "error: failed to download 'docker-${DOCKER_VERSION}' from '${DOCKER_CHANNEL}' for '${dockerArch}'"; \
-# 		exit 1; \
-# 	fi; \
-# 	\
-# 	tar --extract \
-# 		--file docker.tgz \
-# 		--strip-components 1 \
-# 		--directory /usr/local/bin/ \
-# 	; \
-# 	rm docker.tgz; \
-# 	\
-# 	dockerd --version; \
-# 	docker --version
-#
-# COPY modprobe.sh /usr/local/bin/modprobe
-# COPY docker-entrypoint.sh /usr/local/bin/
-#
-# RUN chmod 777 /usr/local/bin/docker-entrypoint.sh \
-#     && ln -s /usr/local/bin/docker-entrypoint.sh /
-#
-# ENTRYPOINT ["docker-entrypoint.sh"]
-# CMD ["sh"]
-
-
+# Install Node and NPM
 RUN apk add --no-cache curl make gcc g++ python linux-headers binutils-gold gnupg libstdc++ && \
   for server in hkps://hkps.pool.sks-keyservers.net pgp.mit.edu keyserver.pgp.com; do \
     gpg --keyserver $server --recv-keys \
@@ -110,5 +53,4 @@ RUN cd / && \
 RUN apk add --update \
     bash \
     && rm -rf /var/cache/apk/*
-# RUN npm install -g npm@6;
 CMD ["bash"]
